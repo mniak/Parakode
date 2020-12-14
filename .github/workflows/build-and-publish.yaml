@@ -17,11 +17,6 @@ jobs:
         fetch-depth: 0
 
     # GitVersion
-    - name: Fetch tags for GitVersion
-      run: git fetch --tags
-    - name: Fetch master for GitVersion
-      if: github.ref != 'refs/heads/master'
-      run: git branch --create-reflog master origin/master
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.7
       with:
