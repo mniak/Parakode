@@ -77,7 +77,7 @@ jobs:
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
       run: dotnet run --project samples/
-
+       
     # Publish
     # - name: Publish to nuget.org
     #   if: github.ref == 'refs/heads/master'
