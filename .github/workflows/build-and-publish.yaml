@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+
   pull_request:
     branches:
       - master
@@ -67,7 +68,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.gitversion.outputs.FullSemVer }}
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.gitversion.outputs.MajorMinorPatch }}
     - name: Run Tests
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
@@ -75,5 +76,5 @@ jobs:
       
     # Publish
     - name: Publish to nuget.org
-      if: steps.gitversion.outputs.PreReleaseTag == ''
+      if: startsWith(github.ref, 'refs/tags/')
       run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
