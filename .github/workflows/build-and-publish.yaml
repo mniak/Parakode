@@ -28,7 +28,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '5.x'
+        dotnet-version: '5.0.101'
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -37,4 +37,8 @@ jobs:
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
       run: dotnet run --project samples/Parakode.Examples
-    # if: ${{ <expression> }}
+
+    # Publish
+    - name: Publish to nuget.org
+      run: echo Dummy publish script
+      if: startsWith(github.ref, "ref/tags/")
