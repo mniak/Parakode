@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     # GitVersion
     - name: Fetch tags for GitVersion
@@ -24,7 +26,7 @@ jobs:
       uses: gittools/actions/gitversion/setup@v0.9.7
       with:
         versionSpec: '5.x'
-    - name: Install GitVersion
+    - name: Run GitVersion
       uses: gittools/actions/gitversion/execute@v0.9.7
       with:
         useConfigFile: true
