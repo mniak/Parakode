@@ -3,8 +3,12 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<LangVersion>9.0</LangVersion>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild> <!-- Generates a package at build -->
 		<IncludeBuildOutput>false</IncludeBuildOutput> <!-- Do not include the generator as a lib dependency -->
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild> <!-- Generates a package at build -->
+		<PackageProjectUrl>https://github.com/mniak/Parakode</PackageProjectUrl>
+		<PackageIconUrl>https://raw.githubusercontent.com/mniak/Parakode/master/parakode-cat.png</PackageIconUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/mniak/Parakode/master/LICENSE.md</PackageLicenseUrl>
+		<PackageTags>source-generator enum</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>
