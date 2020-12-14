@@ -2,8 +2,11 @@ name: Build and Publish to nuget
 
 on:
   push:
-    tags:
-      - "*"
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -25,7 +28,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.x'
+        dotnet-version: '5.x'
     - name: Install dependencies
       run: dotnet restore
     - name: Build
@@ -34,3 +37,4 @@ jobs:
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
       run: dotnet run --project samples/Parakode.Examples
+    # if: ${{ <expression> }}
