@@ -21,8 +21,12 @@ jobs:
       if: github.ref != 'refs/heads/master'
       run: git branch --create-reflog master origin/master
     - name: GitVersion
-      id: gitversion
-      uses: roryprimrose/rungitversion@v1.0.0
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      with:
+        useConfigFile: true
     - name: Output version values 
       run: |
         echo "Major: ${{ steps.gitversion.outputs.Major }}"
