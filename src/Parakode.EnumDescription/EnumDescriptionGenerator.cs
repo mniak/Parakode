@@ -65,16 +65,7 @@ namespace SourceGeneratorSamples
                 )
             );
 
-            var visibility = enumSymbol.DeclaredAccessibility switch
-            {
-                Accessibility.Private => SyntaxKind.PublicKeyword,
-                Accessibility.ProtectedAndInternal => SyntaxKind.ProtectedKeyword,
-                Accessibility.Protected => SyntaxKind.PublicKeyword,
-                Accessibility.Internal => SyntaxKind.PublicKeyword,
-                Accessibility.ProtectedOrInternal => SyntaxKind.PublicKeyword,
-                Accessibility.Public => SyntaxKind.PublicKeyword,
-                _ => SyntaxKind.None,
-            };
+            var visibility = AccessibilityAsSyntaxKind(enumSymbol);
             var unit = CompilationUnit()
                 .WithMembers(
                     SingletonList<MemberDeclarationSyntax>(
@@ -119,6 +110,26 @@ namespace SourceGeneratorSamples
             return CSharpSyntaxTree.ParseText(sourceText);
         }
 
+        private static SyntaxKind AccessibilityAsSyntaxKind(ITypeSymbol type)
+        {
+            var combinedAccessibility = type.DeclaredAccessibility;
+            while ((type = type.ContainingType) is not null)
+            {
+                combinedAccessibility = (Accessibility)Math.Min((byte)combinedAccessibility, (byte)type.DeclaredAccessibility);
+            }
+
+            return combinedAccessibility switch
+            {
+                Accessibility.Private => SyntaxKind.PrivateKeyword,
+                Accessibility.ProtectedAndInternal => SyntaxKind.ProtectedKeyword,
+                Accessibility.Protected => SyntaxKind.ProtectedKeyword,
+                Accessibility.Internal => SyntaxKind.InternalKeyword,
+                Accessibility.ProtectedOrInternal => SyntaxKind.InternalKeyword,
+                Accessibility.Public => SyntaxKind.PublicKeyword,
+                _ => SyntaxKind.None,
+            };
+        }
+
         private static string GetEnumNameConsideringNesting(ITypeSymbol enumSymbol)
         {
             var result = enumSymbol.ToDisplayString(new SymbolDisplayFormat(
@@ -128,7 +139,6 @@ namespace SourceGeneratorSamples
                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
             ));
             return result;
-            //return enumSymbol.Name;
         }
 
         public void Execute(GeneratorExecutionContext context)

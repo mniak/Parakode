@@ -14,8 +14,10 @@ namespace SourceGeneratorSamples.Tests
 {
     public class EnumDescriptionGeneratorTests
     {
-        [Fact]
-        public void SimpleEnum()
+        [Theory]
+        [InlineData("public", Accessibility.Public)]
+        [InlineData("internal", Accessibility.Internal)]
+        public void SimpleEnum(string outerClassVisibility, Accessibility expectedAccessibility)
         {
             const string NAMESPACE = "My.Composite.Namespace";
             const string ENUM_NAME = "SimpleEnum";
@@ -27,18 +29,22 @@ namespace SourceGeneratorSamples.Tests
 using System.ComponentModel;
 
 namespace {NAMESPACE} {{
-    public enum {ENUM_NAME} {{
+    {outerClassVisibility} enum {ENUM_NAME} {{
         [Description(""{description1}"")]
         Member1 = 1,
         [Description(""{description2}"")]
         Member2 = 0,
     }}
 }}");
-            Execute(tree, NAMESPACE, ENUM_NAME);
+            Execute(tree, NAMESPACE, ENUM_NAME, expectedAccessibility);
         }
 
-        [Fact]
-        public void NestedEnum()
+        [Theory]
+        [InlineData("public", "public", Accessibility.Public)]
+        [InlineData("internal", "public", Accessibility.Internal)]
+        [InlineData("public", "internal", Accessibility.Internal)]
+
+        public void NestedEnum(string visibility, string enumVisibility, Accessibility expectedAccessibility)
         {
             const string NAMESPACE = "Another.Arbitrary.Ns";
             const string ENUM_NAME = "EnumNestedInsideClass";
@@ -52,10 +58,10 @@ using System.ComponentModel;
 
 namespace {NAMESPACE}
 {{
-    public class MyClass {{
-        public {ENUM_NAME} Value {{ get; set; }}
+    {visibility} class MyClass {{
+        {enumVisibility} {ENUM_NAME} Value {{ get; set; }}
 
-        public enum {ENUM_NAME} {{
+        {enumVisibility} enum {ENUM_NAME} {{
             [Description(""{description1}"")]
             Member1 = 1,
             [Description(""{description2}"")]
@@ -63,11 +69,9 @@ namespace {NAMESPACE}
         }}
     }}
 }}");
-            Execute(tree, NAMESPACE, ENUM_NAME);
+            Execute(tree, NAMESPACE, ENUM_NAME, expectedAccessibility);
         }
-        private void Execute(SyntaxTree inputSyntaxTree, string NAMESPACE, string ENUM_NAME,
-            Action additionalSemanticTests = null,
-            Action additionalAssemblyTests = null)
+        private void Execute(SyntaxTree inputSyntaxTree, string NAMESPACE, string ENUM_NAME, Accessibility expectedAccessibility)
         {
             var sut = new EnumDescriptionGenerator();
             var enumSyntaxDeclaration = inputSyntaxTree.GetRoot().DescendantNodes().OfType<EnumDeclarationSyntax>().First();
@@ -103,6 +107,7 @@ namespace {NAMESPACE}
                 extensionClass.Name.Should().Be(ENUM_NAME + "Extensions");
                 extensionClass.ContainingNamespace.ToString().Should().Be(NAMESPACE);
                 extensionClass.IsStatic.Should().BeTrue();
+                extensionClass.DeclaredAccessibility.Should().Be(expectedAccessibility);
 
                 var extensionMethod = extensionClass.GetMembers().OfType<IMethodSymbol>().Where(x => x.Name == "GetDescription" && x.Kind == SymbolKind.Method).Single();
                 extensionMethod.IsStatic.Should().BeTrue();
@@ -111,8 +116,6 @@ namespace {NAMESPACE}
                 var param = extensionMethod.Parameters.First();
                 param.Type.Should().Be(enumSymbol);
                 param.IsOptional.Should().BeFalse();
-
-                additionalSemanticTests?.Invoke();
             }
 
             // Assembly level
@@ -137,8 +140,6 @@ namespace {NAMESPACE}
                     invocationResult.Should().NotBeNull();
                     invocationResult.Should().Be(expectedDescription);
                 }
-
-                additionalAssemblyTests?.Invoke();
             }
         }
     }
