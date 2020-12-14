@@ -13,6 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parakode.Examples", "sample
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{7931D5FA-3469-4B7B-BCB4-ED4F84BB4A83}"
 	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-and-publish.yaml = .github\workflows\build-and-publish.yaml
 		README.md = README.md
 	EndProjectSection
 EndProject

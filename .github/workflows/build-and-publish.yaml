@@ -1,0 +1,36 @@
+name: Build and Publish to nuget
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # GitVersion
+    - name: Fetch tags for GitVersion
+      run: git fetch --tags
+    - name: Fetch master for GitVersion
+      if: github.ref != 'refs/heads/master'
+      run: git branch --create-reflog master origin/master
+    - name: GitVersion
+      id: gitversion
+      uses: roryprimrose/rungitversion@v1.0.0
+
+    # Build
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.gitversion.outputs.SemVer }}
+    - name: Run Tests
+      run: dotnet test --configuration Release --no-build 
+    - name: Run Demo
+      run: dotnet run --project samples/Parakode.Examples
