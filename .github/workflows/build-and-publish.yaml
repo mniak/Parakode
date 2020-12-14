@@ -41,4 +41,4 @@ jobs:
     # Publish
     - name: Publish to nuget.org
       run: echo Dummy publish script
-      if: startsWith(github.ref, "ref/tags/")
+      if: startsWith(github.ref, 'ref/tags/')
