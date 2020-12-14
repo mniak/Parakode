@@ -72,13 +72,13 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.gitversion.outputs.SemVer }}
+      run: dotnet build --configuration Release --no-restore -p:Version=${{ steps.gitversion.outputs.FullSemVer }}
     - name: Run Tests
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
       run: dotnet run --project samples/
       
     # Publish
-    # - name: Publish to nuget.org
-    #   if: github.ref == 'refs/heads/master'
-    #   run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+    - name: Publish to nuget.org
+      if: steps.gitversion.outputs.PreReleaseTag == ''
+      run: dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
