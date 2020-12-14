@@ -74,7 +74,7 @@ jobs:
     - name: Run Tests
       run: dotnet test --configuration Release --no-build 
     - name: Run Demo
-      run: dotnet run --project samples/
+      run: dotnet run --configuration Release --no-build --project samples/
       
     # Publish
     - name: Publish to nuget.org
